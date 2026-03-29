@@ -22,19 +22,12 @@ export const proposalService = {
    */
   async createProposal(taskId) {
     try {
-      const executorId = localStorage.getItem('userId');
-
-      if (!executorId) {
-        throw new Error('Пользователь не авторизован');
-      }
-
       const response = await fetch(`${API_BASE_URL}/api/proposals`, {
         method: 'POST',
         headers: getHeaders(),
         credentials: 'include',
         body: JSON.stringify({
           taskId: taskId,
-          executorId: executorId,
         }),
       });
 
@@ -57,7 +50,7 @@ export const proposalService = {
    */
   async getTaskProposals(taskId) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}/proposals`, {
+      const response = await fetch(`${API_BASE_URL}/api/proposals/tasks/${taskId}`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',
