@@ -1,17 +1,10 @@
-const API_BASE_URL = 'https://03ba-192-124-209-165.ngrok-free.app';
+import { API_BASE_URL } from './ApiConsts';
 
 const getHeaders = () => {
   const headers = {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
+    // 'ngrok-skip-browser-warning': 'true',
   };
-
-  const userId = localStorage.getItem('userId');
-  if (userId) {
-    headers['X-User-Id'] = userId;
-  }
-
-  return headers;
 };
 
 export const taskService = {

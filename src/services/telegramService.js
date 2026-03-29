@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://03ba-192-124-209-165.ngrok-free.app';
+import { API_BASE_URL } from './ApiConsts';
 
 export const telegramService = {
   /**
@@ -20,7 +20,7 @@ export const telegramService = {
         throw new Error(errorData.message || 'Ошибка получения ссылки для привязки Telegram');
       }
 
-      const data = await response.json();
+      const data = await response.text();
       return data;
     } catch (error) {
       console.error('Error getting Telegram link:', error);

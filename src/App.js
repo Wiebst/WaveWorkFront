@@ -28,13 +28,13 @@ function App() {
         <Header />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/site" element={<HomePage />} />
 
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/site/login" element={<LoginPage />} />
+            <Route path="/site/register" element={<RegisterPage />} />
 
             <Route
-              path="/tasks"
+              path="/site/tasks"
               element={
                 <ProtectedRoute>
                   <TasksPage />
@@ -42,7 +42,7 @@ function App() {
               }
             />
             <Route
-              path="/task/:id"
+              path="/site/task/:id"
               element={
                 <ProtectedRoute>
                   <TaskDetailPage />
@@ -50,7 +50,7 @@ function App() {
               }
             />
             <Route
-              path="/replies"
+              path="/site/replies"
               element={
                 <ProtectedRoute>
                   <RepliesPage />
@@ -58,7 +58,7 @@ function App() {
               }
             />
             <Route
-              path="/profile"
+              path="/site/profile"
               element={
                 <ProtectedRoute>
                   <ProfilePage />

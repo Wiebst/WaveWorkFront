@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://03ba-192-124-209-165.ngrok-free.app';
+import { API_BASE_URL } from './ApiConsts';
 
 export const authService = {
   /**
@@ -14,6 +14,7 @@ export const authService = {
         headers: {
           'Content-Type': 'application/json',
           'ngrok-skip-browser-warning': 'true',
+          credentials: 'include',
         },
         body: JSON.stringify({ username, password }),
       });
@@ -43,9 +44,10 @@ export const authService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
+          //   'ngrok-skip-browser-warning': 'true',
         },
         body: JSON.stringify({ username, password }),
+        credentials: 'include',
       });
 
       const data = await response.json();

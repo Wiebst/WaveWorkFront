@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://03ba-192-124-209-165.ngrok-free.app';
+import { API_BASE_URL } from './ApiConsts';
 
 export const emailService = {
   async sendConfirmationCode(email) {
@@ -6,12 +6,12 @@ export const emailService = {
       const response = await fetch(
         `${API_BASE_URL}/notification/bind/send-email-confirm?email=${encodeURIComponent(email)}`,
         {
+          credentials: 'include',
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'ngrok-skip-browser-warning': 'true',
           },
-          credentials: 'include',
         },
       );
 
@@ -20,7 +20,7 @@ export const emailService = {
         throw new Error(errorData.message || 'Ошибка отправки кода');
       }
 
-      return await response.json();
+      return await response.text();
     } catch (error) {
       console.error('Error sending confirmation code:', error);
       throw error;

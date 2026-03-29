@@ -110,8 +110,8 @@ function ProfilePage() {
     setIsTelegramLinking(true);
     try {
       const response = await telegramService.getTelegramLink();
-      if (response && response.link) {
-        telegramService.openTelegramLink(response.link);
+      if (response) {
+        telegramService.openTelegramLink(response);
       } else if (response && response.url) {
         telegramService.openTelegramLink(response.url);
       } else {
