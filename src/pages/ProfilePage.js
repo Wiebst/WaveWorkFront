@@ -15,28 +15,62 @@ function ProfilePage() {
     telegram: '',
   });
   const [originalEmail, setOriginalEmail] = useState('');
-  const [avatar, setAvatar] = useState(null);
+  const [avatar] = useState(null);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
   const [isTelegramLinking, setIsTelegramLinking] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const savedData = localStorage.getItem('profileData');
-    if (savedData) {
-      const data = JSON.parse(savedData);
-      setFormData({
-        username: data.username || data.login || '',
-        phone: data.phone || '',
-        email: data.email || '',
-        telegram: data.telegram || '',
-      });
-      setOriginalEmail(data.email || '');
-    }
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/profile/me', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-    const savedAvatar = localStorage.getItem('profileAvatar');
-    if (savedAvatar) {
-      setAvatar(savedAvatar);
-    }
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки профиля');
+        }
+
+        const profileData = await response.json();
+
+        const data = {
+          username: profileData.username || '',
+          phone: profileData.phone || '',
+          email: profileData.email || '',
+          telegram: profileData.telegramUsername || '',
+        };
+
+        setFormData(data);
+        setOriginalEmail(data.email);
+
+        localStorage.setItem('profileData', JSON.stringify(data));
+      } catch (err) {
+        console.error('Ошибка загрузки профиля:', err);
+        setError('Не удалось загрузить данные профиля');
+
+        const savedData = localStorage.getItem('profileData');
+        if (savedData) {
+          const data = JSON.parse(savedData);
+          setFormData({
+            username: data.username || data.login || '',
+            phone: data.phone || '',
+            email: data.email || '',
+            telegram: data.telegram || '',
+          });
+          setOriginalEmail(data.email || '');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
   }, []);
 
   const handleChange = (e) => {
@@ -48,6 +82,7 @@ function ProfilePage() {
     setFormData((prev) => ({ ...prev, email: pendingEmail }));
     setOriginalEmail(pendingEmail);
     setPendingEmail('');
+    setIsEmailModalOpen(false);
   };
 
   const handleEdit = () => {
@@ -68,17 +103,22 @@ function ProfilePage() {
     }
   };
 
-  const performSave = () => {
-    const dataToSave = {
-      username: formData.username,
-      phone: formData.phone,
-      email: formData.email,
-      telegram: formData.telegram,
-    };
-    localStorage.setItem('profileData', JSON.stringify(dataToSave));
-    setOriginalEmail(formData.email || '');
-    setIsEditing(false);
-    alert('✅ Профиль успешно сохранен!');
+  const performSave = async () => {
+    try {
+      const dataToSave = {
+        username: formData.username,
+        phone: formData.phone,
+        email: formData.email,
+        telegram: formData.telegram,
+      };
+      localStorage.setItem('profileData', JSON.stringify(dataToSave));
+      setOriginalEmail(formData.email || '');
+      setIsEditing(false);
+
+      alert('✅ Профиль успешно сохранен!');
+    } catch (err) {
+      alert('Ошибка сохранения: ' + err.message);
+    }
   };
 
   const handleCancel = () => {
@@ -122,13 +162,27 @@ function ProfilePage() {
 
   const displayUsername = formData.username || 'Пользователь';
   const hasTelegram = formData.telegram && formData.telegram.trim() !== '';
-  const telegramDisplay = hasTelegram ? formData.telegram : 'не привязан';
+  const telegramDisplay = hasTelegram ? `@${formData.telegram}` : 'не привязан';
+
+  if (loading) {
+    return (
+      <div className="container profile-container">
+        <div className="page-header">
+          <div className="page-title">👤 Личный кабинет</div>
+        </div>
+        <div className="profile-card">
+          <div style={{ textAlign: 'center', padding: '50px' }}>Загрузка профиля...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container profile-container">
       <div className="page-header">
         <div className="page-title">👤 Личный кабинет</div>
         <div className="page-subtitle">Управление профилем и настройками</div>
+        {error && <div className="error-message">{error}</div>}
       </div>
 
       <div className="profile-card">
