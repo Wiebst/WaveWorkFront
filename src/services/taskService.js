@@ -5,11 +5,6 @@ const getHeaders = () => {
     'Content-Type': 'application/json',
   };
 
-  const userId = localStorage.getItem('userId');
-  if (userId) {
-    headers['X-User-Id'] = userId;
-  }
-
   return headers;
 };
 
@@ -36,7 +31,7 @@ export const taskService = {
 
   async getUserTasks() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/proposals/user`, {
+      const response = await fetch(`${API_BASE_URL}/proposal/api/proposals/user`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',
@@ -56,7 +51,7 @@ export const taskService = {
 
   async getTaskById(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/work/api/tasks/${id}`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',
@@ -76,7 +71,7 @@ export const taskService = {
 
   async createTask(taskData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks`, {
+      const response = await fetch(`${API_BASE_URL}/work/api/tasks`, {
         method: 'POST',
         headers: getHeaders(),
         credentials: 'include',
@@ -105,7 +100,7 @@ export const taskService = {
 
   async updateTask(id, taskData) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/work/api/tasks/${id}`, {
         method: 'PUT',
         headers: getHeaders(),
         credentials: 'include',
@@ -134,7 +129,7 @@ export const taskService = {
 
   async deleteTask(id) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/work/api/tasks/${id}`, {
         method: 'DELETE',
         headers: getHeaders(),
         credentials: 'include',
