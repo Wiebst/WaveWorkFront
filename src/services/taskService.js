@@ -41,7 +41,45 @@ export const taskService = {
         throw new Error(errorData.message || 'Ошибка загрузки ваших задач');
       }
 
-      return await response.json();
+      const tasksData = await response.json();
+
+      const tasksWithContacts = await Promise.all(
+        tasksData.data.map(async (task) => {
+          if (!task.executorId) return task;
+
+          try {
+            const contactResponse = await fetch(`${API_BASE_URL}/me/contact/${task.executorId}`, {
+              method: 'GET',
+              headers: getHeaders(),
+              credentials: 'include',
+            });
+
+            if (contactResponse.ok) {
+              const contactData = await contactResponse.json();
+              return {
+                ...task,
+                contact: {
+                  email: contactData.email,
+                  phone: contactData.phone,
+                  telegramUsername: contactData.telegramUsername,
+                },
+              };
+            }
+          } catch (contactError) {
+            console.warn(
+              `Не удалось загрузить контакты для executorId ${task.executorId}:`,
+              contactError,
+            );
+          }
+
+          return task;
+        }),
+      );
+
+      return {
+        ...tasksData,
+        data: tasksWithContacts,
+      };
     } catch (error) {
       console.error('Error fetching user tasks:', error);
       throw error;

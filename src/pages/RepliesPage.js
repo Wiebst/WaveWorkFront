@@ -84,7 +84,6 @@ function RepliesPage() {
       setTotalItems((prev) => prev - 1);
       alert('✅ Задача успешно удалена!');
 
-      // Если после удаления страница пуста и это не первая страница, переходим на предыдущую
       if (tasks.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       } else {
