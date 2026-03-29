@@ -155,7 +155,7 @@ function TasksPage() {
       ) : (
         <>
           <div className="vacancies-grid">
-            {tasks.map((task) => (
+            {tasks.map((task) =>  (
               <TaskCard key={task.id} task={task} />
             ))}
           </div>
