@@ -14,9 +14,6 @@ const getHeaders = () => {
 };
 
 export const taskService = {
-  /**
-   * Получение всех задач с пагинацией
-   */
   async getAllTasks(page = 1, limit = 18) {
     try {
       const response = await fetch(`${API_BASE_URL}/work/api/tasks?page=${page}&limit=${limit}`, {
@@ -37,12 +34,9 @@ export const taskService = {
     }
   },
 
-  /**
-   * Получение задач пользователя с пагинацией
-   */
-  async getUserTasks(page = 1, limit = 18) {
+  async getUserTasks() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks/user?page=${page}&limit=${limit}`, {
+      const response = await fetch(`${API_BASE_URL}/api/proposals/user`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',
@@ -60,9 +54,6 @@ export const taskService = {
     }
   },
 
-  /**
-   * Получение задачи по ID
-   */
   async getTaskById(id) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
@@ -83,9 +74,6 @@ export const taskService = {
     }
   },
 
-  /**
-   * Создание новой задачи
-   */
   async createTask(taskData) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks`, {
@@ -115,9 +103,6 @@ export const taskService = {
     }
   },
 
-  /**
-   * Обновление задачи
-   */
   async updateTask(id, taskData) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
@@ -147,9 +132,6 @@ export const taskService = {
     }
   },
 
-  /**
-   * Удаление задачи
-   */
   async deleteTask(id) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {

@@ -7,7 +7,6 @@ function TasksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Пагинация
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);

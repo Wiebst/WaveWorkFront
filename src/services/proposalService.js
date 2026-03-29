@@ -14,9 +14,6 @@ const getHeaders = () => {
 };
 
 export const proposalService = {
-  /**
-   * Откликнуться на задачу
-   */
   async createProposal(taskId) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/proposals`, {
@@ -40,9 +37,6 @@ export const proposalService = {
     }
   },
 
-  /**
-   * Получение откликов на задачу с пагинацией
-   */
   async getTaskProposals(taskId, page = 1, limit = 18) {
     try {
       const response = await fetch(
@@ -66,9 +60,6 @@ export const proposalService = {
     }
   },
 
-  /**
-   * Получение моих откликов с пагинацией
-   */
   async getUserProposals(page = 1, limit = 18) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/proposals/my?page=${page}&limit=${limit}`, {

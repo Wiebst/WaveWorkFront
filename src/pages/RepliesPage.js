@@ -10,21 +10,17 @@ function RepliesPage() {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Пагинация для задач
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const limit = 18;
 
   const loadUserTasks = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const response = await taskService.getUserTasks(currentPage, limit);
+      const response = await taskService.getUserTasks();
       const tasksData = response.items || response;
       setTasks(tasksData);
-      setTotalPages(response.totalPages || 1);
-      setTotalItems(response.total || tasksData.length);
       await loadProposalsForTasks(tasksData);
     } catch (err) {
       setError(err.message || 'Ошибка загрузки ваших задач');
@@ -32,7 +28,7 @@ function RepliesPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, limit]);
+  }, []);
 
   useEffect(() => {
     loadUserTasks();
@@ -65,14 +61,12 @@ function RepliesPage() {
   const handleAddTaskSubmit = async (taskData) => {
     try {
       const createdTask = await taskService.createTask(taskData);
-      // Перезагружаем первую страницу, так как новая задача должна быть первой
       if (currentPage === 1) {
         setTasks((prevTasks) => [createdTask, ...prevTasks]);
       }
       setTotalItems((prev) => prev + 1);
       alert('✅ Задача успешно добавлена!');
 
-      // Если не на первой странице, переходим на первую
       if (currentPage !== 1) {
         setCurrentPage(1);
       } else {
