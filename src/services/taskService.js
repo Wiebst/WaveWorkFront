@@ -30,7 +30,7 @@ export const taskService = {
 
   async getUserTasks() {
     try {
-      const response = await fetch(`${API_BASE_URL}/work/tasks/api/tasks/my`, {
+      const response = await fetch(`${API_BASE_URL}/work/api/tasks/my`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',

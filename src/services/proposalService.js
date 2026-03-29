@@ -5,18 +5,13 @@ const getHeaders = () => {
     'Content-Type': 'application/json',
   };
 
-  const userId = localStorage.getItem('userId');
-  if (userId) {
-    headers['X-User-Id'] = userId;
-  }
-
   return headers;
 };
 
 export const proposalService = {
   async createProposal(taskId) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/proposals`, {
+      const response = await fetch(`${API_BASE_URL}/proposal/api/proposals`, {
         method: 'POST',
         headers: getHeaders(),
         credentials: 'include',
@@ -40,7 +35,7 @@ export const proposalService = {
   async getTaskProposals(taskId, page = 1, limit = 18) {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/proposals/task/${taskId}?page=${page}&limit=${limit}`,
+        `${API_BASE_URL}/proposal/api/proposals/task/${taskId}?page=${page}&limit=${limit}`,
         {
           method: 'GET',
           headers: getHeaders(),
@@ -62,7 +57,7 @@ export const proposalService = {
 
   async getUserProposals(page = 1, limit = 18) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/proposals/my?page=${page}&limit=${limit}`, {
+      const response = await fetch(`${API_BASE_URL}/proposal/api/proposals/my?page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',

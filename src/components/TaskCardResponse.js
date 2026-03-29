@@ -61,15 +61,15 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
             <div className="company-name">{task.title || 'Без названия'}</div>
             <div className="job-title">{task.specialization || 'Без специализации'}</div>
           </div>
-          <div className="salary-badge">💰 {formatSalary(task.salary)}</div>
+          <div className="salary-badge">💰 {formatSalary(task.budget)}</div>
         </div>
 
         <div className="card-body">
-          {task.tech && task.tech.length > 0 && (
+          {task.technologies && task.technologies.length > 0 && (
             <div className="tech-stack">
-              {task.tech.map((tech, index) => (
-                <span className="tech-tag" key={index}>
-                  {tech}
+              {task.technologies.map((tech) => (
+                <span className="tech-tag" key={tech.id}>
+                  {tech.name}
                 </span>
               ))}
             </div>
