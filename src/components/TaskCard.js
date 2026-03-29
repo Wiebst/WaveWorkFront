@@ -5,7 +5,7 @@ function TaskCard({ task }) {
   const navigate = useNavigate();
 
   const handleNavigate = () => {
-    navigate(`/task/${task.id}`);
+    navigate(`/site/task/${task.id}`);
   };
 
   const formatBudget = (budget) => {
@@ -48,7 +48,7 @@ function TaskCard({ task }) {
           <div className="tech-stack">
             {task.technologies.map((tech, index) => (
               <span className="tech-tag" key={index}>
-                {tech}
+                {tech.name}
               </span>
             ))}
           </div>

@@ -4,12 +4,6 @@ const getHeaders = () => {
   const headers = {
     'Content-Type': 'application/json',
   };
-
-  const userId = localStorage.getItem('userId');
-  if (userId) {
-    headers['X-User-Id'] = userId;
-  }
-
   return headers;
 };
 
@@ -36,7 +30,7 @@ export const taskService = {
 
   async getUserTasks() {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/proposals/user`, {
+      const response = await fetch(`${API_BASE_URL}/work/tasks/api/tasks/my`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',

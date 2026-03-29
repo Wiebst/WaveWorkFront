@@ -17,7 +17,7 @@ function TasksPage() {
     setError('');
     try {
       const response = await taskService.getAllTasks(currentPage, limit);
-      const tasksData = response.items || response;
+      const tasksData = response.data || response;
       setTasks(tasksData);
       setTotalPages(response.totalPages || 1);
       setTotalItems(response.total || tasksData.length);
