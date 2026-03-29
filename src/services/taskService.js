@@ -3,18 +3,23 @@ import { API_BASE_URL } from './ApiConsts';
 const getHeaders = () => {
   const headers = {
     'Content-Type': 'application/json',
-    // 'ngrok-skip-browser-warning': 'true',
   };
+
+  const userId = localStorage.getItem('userId');
+  if (userId) {
+    headers['X-User-Id'] = userId;
+  }
+
+  return headers;
 };
 
 export const taskService = {
   /**
-   * Получение всех задач (для страницы "Задачи")
-   * @returns {Promise} - Список задач
+   * Получение всех задач с пагинацией
    */
-  async getAllTasks() {
+  async getAllTasks(page = 1, limit = 18) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks`, {
+      const response = await fetch(`${API_BASE_URL}/api/tasks?page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',
@@ -33,12 +38,11 @@ export const taskService = {
   },
 
   /**
-   * Получение задач пользователя (для страницы "Отклики")
-   * @returns {Promise} - Список задач пользователя
+   * Получение задач пользователя с пагинацией
    */
-  async getUserTasks() {
+  async getUserTasks(page = 1, limit = 18) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks/user`, {
+      const response = await fetch(`${API_BASE_URL}/api/tasks/user?page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',
@@ -58,8 +62,6 @@ export const taskService = {
 
   /**
    * Получение задачи по ID
-   * @param {string|number} id - ID задачи
-   * @returns {Promise} - Данные задачи
    */
   async getTaskById(id) {
     try {
@@ -83,8 +85,6 @@ export const taskService = {
 
   /**
    * Создание новой задачи
-   * @param {Object} taskData - Данные задачи
-   * @returns {Promise} - Созданная задача
    */
   async createTask(taskData) {
     try {
@@ -96,7 +96,7 @@ export const taskService = {
           title: taskData.title,
           description: taskData.description,
           budget: taskData.budget,
-          category: taskData.category || 'null',
+          category: taskData.category || null,
           specialization: taskData.specialization,
           technologies: taskData.technologies || [],
           deadline: taskData.deadline || null,
@@ -117,9 +117,6 @@ export const taskService = {
 
   /**
    * Обновление задачи
-   * @param {string|number} id - ID задачи
-   * @param {Object} taskData - Обновленные данные задачи
-   * @returns {Promise} - Обновленная задача
    */
   async updateTask(id, taskData) {
     try {
@@ -131,7 +128,7 @@ export const taskService = {
           title: taskData.title,
           description: taskData.description,
           budget: taskData.budget,
-          category: taskData.category || 'null',
+          category: taskData.category || null,
           specialization: taskData.specialization,
           technologies: taskData.technologies || [],
           deadline: taskData.deadline || null,
@@ -149,10 +146,9 @@ export const taskService = {
       throw error;
     }
   },
+
   /**
    * Удаление задачи
-   * @param {string|number} id - ID задачи
-   * @returns {Promise} - Результат удаления
    */
   async deleteTask(id) {
     try {
@@ -170,31 +166,6 @@ export const taskService = {
       return await response.json();
     } catch (error) {
       console.error('Error deleting task:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Получение откликов на задачу (для работодателя)
-   * @param {string|number} taskId - ID задачи
-   * @returns {Promise} - Список откликов
-   */
-  async getTaskProposals(taskId) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}/proposals`, {
-        method: 'GET',
-        headers: getHeaders(),
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Ошибка загрузки откликов');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching task proposals:', error);
       throw error;
     }
   },

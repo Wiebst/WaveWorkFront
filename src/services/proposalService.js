@@ -3,7 +3,6 @@ import { API_BASE_URL } from './ApiConsts';
 const getHeaders = () => {
   const headers = {
     'Content-Type': 'application/json',
-    // 'ngrok-skip-browser-warning': 'true',
   };
 
   const userId = localStorage.getItem('userId');
@@ -17,8 +16,6 @@ const getHeaders = () => {
 export const proposalService = {
   /**
    * Откликнуться на задачу
-   * @param {string|number} taskId - ID задачи
-   * @returns {Promise} - Результат отклика
    */
   async createProposal(taskId) {
     try {
@@ -44,17 +41,18 @@ export const proposalService = {
   },
 
   /**
-   * Получение откликов на задачу (для работодателя)
-   * @param {string|number} taskId - ID задачи
-   * @returns {Promise} - Список откликов
+   * Получение откликов на задачу с пагинацией
    */
-  async getTaskProposals(taskId) {
+  async getTaskProposals(taskId, page = 1, limit = 18) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/proposals/tasks/${taskId}`, {
-        method: 'GET',
-        headers: getHeaders(),
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/proposals/task/${taskId}?page=${page}&limit=${limit}`,
+        {
+          method: 'GET',
+          headers: getHeaders(),
+          credentials: 'include',
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -63,18 +61,17 @@ export const proposalService = {
 
       return await response.json();
     } catch (error) {
-      console.error('Error fetching proposals:', error);
+      console.error('Error fetching task proposals:', error);
       throw error;
     }
   },
 
   /**
-   * Получение моих откликов (для исполнителя)
-   * @returns {Promise} - Список откликов пользователя
+   * Получение моих откликов с пагинацией
    */
-  async getUserProposals() {
+  async getUserProposals(page = 1, limit = 18) {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/proposals/my`, {
+      const response = await fetch(`${API_BASE_URL}/api/proposals/my?page=${page}&limit=${limit}`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',

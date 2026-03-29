@@ -184,3 +184,54 @@
     font-size: 0.85rem;
   }
 }
+
+// Стили для пагинации
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-sm;
+  margin: $spacing-xl 0;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  padding: $spacing-sm $spacing-md;
+  border-radius: 10px;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-fast;
+  min-width: 40px;
+  font-family: inherit;
+
+  &:hover:not(.disabled) {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: $accent-purple-light;
+  }
+
+  &.active {
+    background: linear-gradient(115deg, #8b5cf6, #7c3aed);
+    border-color: transparent;
+    color: white;
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.page-dots {
+  color: $text-muted;
+  padding: 0 $spacing-xs;
+  display: flex;
+  align-items: center;
+}
+
+.pagination-info {
+  text-align: center;
+  margin: $spacing-lg 0 $spacing-sm;
+  color: $text-dark-muted;
+  font-size: 0.85rem;
+}

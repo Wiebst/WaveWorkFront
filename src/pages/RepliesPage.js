@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import TaskCardResponse from '../components/TaskCardResponse';
 import AddTaskModal from '../components/AddTaskModal';
-// import { taskService } from '../services/taskService'; // бэкенд
-import { tasks as mockTasks } from '../data/tasks'; // локальные данные
+import { taskService } from '../services/taskService';
+import { proposalService } from '../services/proposalService';
 
 function RepliesPage() {
   const [tasks, setTasks] = useState([]);
@@ -10,26 +10,51 @@ function RepliesPage() {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    loadUserTasks();
-  }, []);
+  // Пагинация для задач
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const limit = 18;
 
-  const loadUserTasks = async () => {
+  const loadUserTasks = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      // ========== БЭКЕНД ==========
-      // const data = await taskService.getUserTasks();
-      // setTasks(data);
-      // ========== ЛОКАЛЬНЫЕ ДАННЫЕ ==========
-      setTimeout(() => {
-        setTasks(mockTasks);
-        setLoading(false);
-      }, 500);
+      const response = await taskService.getUserTasks(currentPage, limit);
+      const tasksData = response.items || response;
+      setTasks(tasksData);
+      setTotalPages(response.totalPages || 1);
+      setTotalItems(response.total || tasksData.length);
+      await loadProposalsForTasks(tasksData);
     } catch (err) {
       setError(err.message || 'Ошибка загрузки ваших задач');
       console.error('Failed to load user tasks:', err);
+    } finally {
       setLoading(false);
+    }
+  }, [currentPage, limit]);
+
+  useEffect(() => {
+    loadUserTasks();
+  }, [loadUserTasks]);
+
+  const loadProposalsForTasks = async (tasksList) => {
+    try {
+      const tasksWithProposals = await Promise.all(
+        tasksList.map(async (task) => {
+          try {
+            const proposalsResponse = await proposalService.getTaskProposals(task.id, 1, 100);
+            const proposals = proposalsResponse.items || proposalsResponse;
+            return { ...task, responses: proposals };
+          } catch (err) {
+            console.error(`Failed to load proposals for task ${task.id}:`, err);
+            return { ...task, responses: [] };
+          }
+        }),
+      );
+      setTasks(tasksWithProposals);
+    } catch (err) {
+      console.error('Error loading proposals:', err);
     }
   };
 
@@ -39,24 +64,20 @@ function RepliesPage() {
 
   const handleAddTaskSubmit = async (taskData) => {
     try {
-      // ========== БЭКЕНД ==========
-      // const createdTask = await taskService.createTask(taskData);
-      // setTasks((prevTasks) => [createdTask, ...prevTasks]);
-
-      // ========== ЛОКАЛЬНЫЕ ДАННЫЕ ==========
-      const getRandomLogo = () => {
-        const logos = ['💻', '🎨', '🤖', '📱', '🚀', '⚡', '🎯', '💡', '🔧', '📊'];
-        return logos[Math.floor(Math.random() * logos.length)];
-      };
-
-      const createdTask = {
-        ...taskData,
-        id: Date.now(),
-        logo: getRandomLogo(),
-        responses: [],
-      };
-      setTasks((prevTasks) => [createdTask, ...prevTasks]);
+      const createdTask = await taskService.createTask(taskData);
+      // Перезагружаем первую страницу, так как новая задача должна быть первой
+      if (currentPage === 1) {
+        setTasks((prevTasks) => [createdTask, ...prevTasks]);
+      }
+      setTotalItems((prev) => prev + 1);
       alert('✅ Задача успешно добавлена!');
+
+      // Если не на первой странице, переходим на первую
+      if (currentPage !== 1) {
+        setCurrentPage(1);
+      } else {
+        await loadUserTasks();
+      }
     } catch (err) {
       alert('Ошибка добавления задачи: ' + err.message);
     }
@@ -64,12 +85,17 @@ function RepliesPage() {
 
   const handleDeleteTask = async (taskId) => {
     try {
-      // ========== БЭКЕНД ==========
-      // await taskService.deleteTask(taskId);
-
-      // ========== ЛОКАЛЬНЫЕ ДАННЫЕ ==========
+      await taskService.deleteTask(taskId);
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      setTotalItems((prev) => prev - 1);
       alert('✅ Задача успешно удалена!');
+
+      // Если после удаления страница пуста и это не первая страница, переходим на предыдущую
+      if (tasks.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        await loadUserTasks();
+      }
     } catch (err) {
       alert('Ошибка удаления задачи: ' + err.message);
     }
@@ -77,14 +103,8 @@ function RepliesPage() {
 
   const handleEditTask = async (updatedTask) => {
     try {
-      // ========== БЭКЕНД ==========
-      // const result = await taskService.updateTask(updatedTask.id, updatedTask);
-      // setTasks((prevTasks) => prevTasks.map((task) => (task.id === result.id ? result : task)));
-
-      // ========== ЛОКАЛЬНЫЕ ДАННЫЕ ==========
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
-      );
+      const result = await taskService.updateTask(updatedTask.id, updatedTask);
+      setTasks((prevTasks) => prevTasks.map((task) => (task.id === result.id ? result : task)));
       alert('✅ Задача успешно обновлена!');
     } catch (err) {
       alert('Ошибка обновления задачи: ' + err.message);
@@ -93,6 +113,78 @@ function RepliesPage() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage + 1 < maxVisible) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="pagination">
+        <button
+          className={`page-btn ${currentPage === 1 ? 'disabled' : ''}`}
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          ← Назад
+        </button>
+
+        {startPage > 1 && (
+          <>
+            <button className="page-btn" onClick={() => handlePageChange(1)}>
+              1
+            </button>
+            {startPage > 2 && <span className="page-dots">...</span>}
+          </>
+        )}
+
+        {pages.map((page) => (
+          <button
+            key={page}
+            className={`page-btn ${currentPage === page ? 'active' : ''}`}
+            onClick={() => handlePageChange(page)}
+          >
+            {page}
+          </button>
+        ))}
+
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="page-dots">...</span>}
+            <button className="page-btn" onClick={() => handlePageChange(totalPages)}>
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        <button
+          className={`page-btn ${currentPage === totalPages ? 'disabled' : ''}`}
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Вперед →
+        </button>
+      </div>
+    );
   };
 
   if (loading) {
@@ -147,16 +239,24 @@ function RepliesPage() {
           </div>
         </div>
       ) : (
-        <div className="tasks-grid">
-          {tasks.map((task) => (
-            <TaskCardResponse
-              key={task.id}
-              task={task}
-              onDelete={handleDeleteTask}
-              onEdit={handleEditTask}
-            />
-          ))}
-        </div>
+        <>
+          <div className="tasks-grid">
+            {tasks.map((task) => (
+              <TaskCardResponse
+                key={task.id}
+                task={task}
+                onDelete={handleDeleteTask}
+                onEdit={handleEditTask}
+              />
+            ))}
+          </div>
+
+          <div className="pagination-info">
+            Показано {tasks.length} из {totalItems} задач
+          </div>
+
+          {renderPagination()}
+        </>
       )}
 
       <div className="add-task-container">

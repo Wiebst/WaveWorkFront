@@ -13,7 +13,6 @@ export const authService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
           credentials: 'include',
         },
         body: JSON.stringify({ username, password }),
@@ -44,7 +43,6 @@ export const authService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          //   'ngrok-skip-browser-warning': 'true',
         },
         body: JSON.stringify({ username, password }),
         credentials: 'include',
@@ -75,7 +73,6 @@ export const authService = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
         },
         credentials: 'include',
       });

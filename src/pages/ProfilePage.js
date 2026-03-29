@@ -50,10 +50,6 @@ function ProfilePage() {
     setPendingEmail('');
   };
 
-  const handleAvatarClick = () => {
-    console.log('Функция выбора аватара временно отключена');
-  };
-
   const handleEdit = () => {
     setIsEditing(true);
   };
@@ -137,9 +133,7 @@ function ProfilePage() {
 
       <div className="profile-card">
         <div className="profile-avatar-section">
-          <div className="profile-avatar" onClick={handleAvatarClick}>
-            {avatar ? <img src={avatar} alt="avatar" /> : '👤'}
-          </div>
+          <div className="profile-avatar">{avatar ? <img src={avatar} alt="avatar" /> : '👤'}</div>
           <h2 className="profile-name">{displayUsername}</h2>
         </div>
 

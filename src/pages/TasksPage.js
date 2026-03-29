@@ -1,34 +1,109 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import TaskCard from '../components/TaskCard';
-// import { taskService } from '../services/taskService'; // бэкенд
-import { tasks as mockTasks } from '../data/tasks'; // локальные данные
+import { taskService } from '../services/taskService';
 
 function TasksPage() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadTasks();
-  }, []);
+  // Пагинация
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const limit = 18;
 
-  const loadTasks = async () => {
+  const loadTasks = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      // ========== БЭКЕНД ==========
-      // const data = await taskService.getAllTasks();
-      // setTasks(data);
-      // ========== ЛОКАЛЬНЫЕ ДАННЫЕ ==========
-      setTimeout(() => {
-        setTasks(mockTasks);
-        setLoading(false);
-      }, 500);
+      const response = await taskService.getAllTasks(currentPage, limit);
+      const tasksData = response.items || response;
+      setTasks(tasksData);
+      setTotalPages(response.totalPages || 1);
+      setTotalItems(response.total || tasksData.length);
     } catch (err) {
       setError(err.message || 'Ошибка загрузки задач');
       console.error('Failed to load tasks:', err);
+    } finally {
       setLoading(false);
     }
+  }, [currentPage, limit]);
+
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage + 1 < maxVisible) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <div className="pagination">
+        <button
+          className={`page-btn ${currentPage === 1 ? 'disabled' : ''}`}
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          ← Назад
+        </button>
+
+        {startPage > 1 && (
+          <>
+            <button className="page-btn" onClick={() => handlePageChange(1)}>
+              1
+            </button>
+            {startPage > 2 && <span className="page-dots">...</span>}
+          </>
+        )}
+
+        {pages.map((page) => (
+          <button
+            key={page}
+            className={`page-btn ${currentPage === page ? 'active' : ''}`}
+            onClick={() => handlePageChange(page)}
+          >
+            {page}
+          </button>
+        ))}
+
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span className="page-dots">...</span>}
+            <button className="page-btn" onClick={() => handlePageChange(totalPages)}>
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        <button
+          className={`page-btn ${currentPage === totalPages ? 'disabled' : ''}`}
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Вперед →
+        </button>
+      </div>
+    );
   };
 
   if (loading) {
@@ -85,16 +160,12 @@ function TasksPage() {
               <TaskCard key={task.id} task={task} />
             ))}
           </div>
-          <div
-            style={{
-              textAlign: 'center',
-              margin: '20px 0 10px',
-              color: '#9d93cb',
-              fontSize: '0.85rem',
-            }}
-          >
-            🔍 Найдено <span>{tasks.length}</span> предложений
+
+          <div className="pagination-info">
+            Показано {tasks.length} из {totalItems} задач
           </div>
+
+          {renderPagination()}
         </>
       )}
     </div>

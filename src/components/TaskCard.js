@@ -8,10 +8,10 @@ function TaskCard({ task }) {
     navigate(`/task/${task.id}`);
   };
 
-  const formatSalary = (salary) => {
-    if (!salary && salary !== 0) return 'не указана';
-    const num = typeof salary === 'number' ? salary : parseFloat(salary);
-    if (isNaN(num)) return 'не указана';
+  const formatBudget = (budget) => {
+    if (!budget && budget !== 0) return 'не указан';
+    const num = typeof budget === 'number' ? budget : parseFloat(budget);
+    if (isNaN(num)) return 'не указан';
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
       currency: 'RUB',
@@ -40,13 +40,13 @@ function TaskCard({ task }) {
           <div className="company-name">{task.title || 'Без названия'}</div>
           <div className="job-title">{task.specialization || 'Без специализации'}</div>
         </div>
-        <div className="salary-badge">💰 {formatSalary(task.salary)}</div>
+        <div className="salary-badge">💰 {formatBudget(task.budget)}</div>
       </div>
 
       <div className="card-body">
-        {task.tech && task.tech.length > 0 && (
+        {task.technologies && task.technologies.length > 0 && (
           <div className="tech-stack">
-            {task.tech.map((tech, index) => (
+            {task.technologies.map((tech, index) => (
               <span className="tech-tag" key={index}>
                 {tech}
               </span>

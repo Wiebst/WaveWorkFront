@@ -40,10 +40,10 @@ function TaskDetailPage() {
     }
   };
 
-  const formatSalary = (salary) => {
-    if (!salary && salary !== 0) return 'не указана';
-    const num = typeof salary === 'number' ? salary : parseFloat(salary);
-    if (isNaN(num)) return 'не указана';
+  const formatBudget = (budget) => {
+    if (!budget && budget !== 0) return 'не указан';
+    const num = typeof budget === 'number' ? budget : parseFloat(budget);
+    if (isNaN(num)) return 'не указан';
     return new Intl.NumberFormat('ru-RU', {
       style: 'currency',
       currency: 'RUB',
@@ -119,7 +119,7 @@ function TaskDetailPage() {
           <div className="task-title-section">
             <div className="company-name-large">{task.title || 'Без названия'}</div>
             <div className="job-title-large">{task.specialization || 'Без специализации'}</div>
-            <div className="salary-large">💰 {formatSalary(task.salary)}</div>
+            <div className="salary-large">💰 {formatBudget(task.budget)}</div>
             {task.deadline && (
               <div className="deadline-large">⏰ Дедлайн: {formatDeadline(task.deadline)}</div>
             )}
@@ -131,8 +131,8 @@ function TaskDetailPage() {
               <span>🛠️</span> Стек технологий
             </div>
             <div className="tech-stack-large">
-              {task.tech && task.tech.length > 0 ? (
-                task.tech.map((tech, idx) => (
+              {task.technologies && task.technologies.length > 0 ? (
+                task.technologies.map((tech, idx) => (
                   <span className="tech-tag-large" key={idx}>
                     {tech}
                   </span>
@@ -146,9 +146,7 @@ function TaskDetailPage() {
             <div className="info-title">
               <span>📋</span> Описание задачи
             </div>
-            <div className="description-text">
-              {task.description || task.desc || 'Описание отсутствует'}
-            </div>
+            <div className="description-text">{task.description || 'Описание отсутствует'}</div>
           </div>
 
           <div className="contacts-block">
