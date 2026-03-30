@@ -49,7 +49,7 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
   const formatDeadline = (deadline) => {
     if (!deadline) return null;
     const date = new Date(deadline);
-    if (isNaN(date.getTime())) return null;
+    if (isNaN(date.getTime()) || date.getFullYear() === 1970) return null;
     return date.toLocaleString('ru-RU', {
       day: 'numeric',
       month: 'short',
@@ -89,7 +89,10 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
             </div>
           )}
           <div className="job-description">{description}</div>
-          {deadline && <div className="deadline-info">⏰ Дедлайн: {formatDeadline(deadline)}</div>}
+          <div className="deadline-info">
+            ⏰ Дедлайн:{' '}
+            {deadline && formatDeadline(deadline) ? formatDeadline(deadline) : 'не указано'}
+          </div>
         </div>
 
         <div className="card-footer">
