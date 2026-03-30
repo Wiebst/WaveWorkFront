@@ -22,11 +22,14 @@ function TaskDetailPage() {
       setTask(task);
 
       try {
-        const contactResponse = await fetch(`${API_BASE_URL}/me/contact/${task.createdByUserId}`, {
-          method: 'GET',
-          headers: getHeaders(),
-          credentials: 'include',
-        });
+        const contactResponse = await fetch(
+          `${API_BASE_URL}/profile/profiles/me/contact/${task.createdByUserId}`,
+          {
+            method: 'GET',
+            headers: getHeaders(),
+            credentials: 'include',
+          },
+        );
 
         if (contactResponse.ok) {
           const contactData = await contactResponse.json();
