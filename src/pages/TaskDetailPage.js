@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { taskService } from '../services/taskService';
 import { proposalService } from '../services/proposalService';
+import { API_BASE_URL } from '../services/ApiConsts';
+import { getHeaders } from '../services/taskService';
 
 function TaskDetailPage() {
   const { id } = useParams();
@@ -9,6 +11,7 @@ function TaskDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isApplying, setIsApplying] = useState(false);
+  const [contacts, setContacts] = useState(null);
 
   const loadTask = useCallback(async () => {
     setLoading(true);
@@ -17,6 +20,28 @@ function TaskDetailPage() {
       const data = await taskService.getTaskById(id);
       const task = data.data || data;
       setTask(task);
+
+      try {
+        const contactResponse = await fetch(`${API_BASE_URL}/me/contact/${task.createdByUserId}`, {
+          method: 'GET',
+          headers: getHeaders(),
+          credentials: 'include',
+        });
+
+        if (contactResponse.ok) {
+          const contactData = await contactResponse.json();
+          setContacts({
+            phone: contactData.phone || null,
+            email: contactData.email || null,
+            telegram: contactData.telegramUsername || null,
+          });
+        } else {
+          setContacts(null);
+        }
+      } catch (err) {
+        console.warn('Failed to load contacts:', err);
+        setContacts(null);
+      }
     } catch (err) {
       setError(err.message || 'Ошибка загрузки задачи');
       console.error('Failed to load task:', err);
@@ -158,7 +183,7 @@ function TaskDetailPage() {
               <div className="contact-icon">📱</div>
               <div className="contact-info">
                 <div className="contact-label">Телефон</div>
-                <div className="contact-value">{task.contacts?.phone || 'Не указан'}</div>
+                <div className="contact-value">{contacts?.phone || 'Не указан'}</div>
               </div>
             </div>
             <div className="contact-item">
@@ -167,7 +192,7 @@ function TaskDetailPage() {
                 <div className="contact-label">Email</div>
                 <div className="contact-value">
                   {task.contacts?.email ? (
-                    <a href={`mailto:${task.contacts.email}`}>{task.contacts.email}</a>
+                    <a href={`mailto:${contacts.email}`}>{contacts.email}</a>
                   ) : (
                     'Не указан'
                   )}
@@ -181,11 +206,11 @@ function TaskDetailPage() {
                 <div className="contact-value">
                   {task.contacts?.telegram ? (
                     <a
-                      href={`https://t.me/${task.contacts.telegram.replace('@', '')}`}
+                      href={`https://t.me/${contacts.telegram.replace('@', '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {task.contacts.telegram}
+                      {contacts.telegram}
                     </a>
                   ) : (
                     'Не указан'
