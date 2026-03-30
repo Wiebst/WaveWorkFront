@@ -92,6 +92,11 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
       .map((t) => t.trim())
       .filter((t) => t);
 
+    if (technologiesArray.length === 0) {
+      setError('Добавьте хотя бы одну технологию');
+      return;
+    }
+
     const updatedTask = {
       ...task,
       title: formData.title,

@@ -17,10 +17,12 @@ function TasksPage() {
     setError('');
     try {
       const response = await taskService.getAllTasks(currentPage, limit);
-      const tasksData = response.data || response;
-      setTasks(tasksData);
-      setTotalPages(response.totalPages || 1);
-      setTotalItems(response.total || tasksData.length);
+      const tasksData = response.data || response.items || response;
+      const pagination = response.pagination || response.meta || {};
+
+      setTasks(Array.isArray(tasksData) ? tasksData : []);
+      setTotalPages(pagination.totalPages || response.totalPages || 1);
+      setTotalItems(pagination.totalItems || response.totalItems || tasksData.length);
     } catch (err) {
       setError(err.message || 'Ошибка загрузки задач');
       console.error('Failed to load tasks:', err);

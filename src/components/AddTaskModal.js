@@ -60,6 +60,16 @@ function AddTaskModal({ isOpen, onClose, onAdd }) {
       return;
     }
 
+    const technologiesArray = formData.technologies
+      .split(',')
+      .map((t) => t.trim())
+      .filter((t) => t);
+
+    if (technologiesArray.length === 0) {
+      setError('Добавьте хотя бы одну технологию');
+      return;
+    }
+
     setIsLoading(true);
 
     const taskData = {

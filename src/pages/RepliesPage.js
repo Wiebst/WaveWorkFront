@@ -318,7 +318,7 @@ function RepliesPage() {
           </div>
 
           <div className="pagination-info">
-            Показано {tasks.length} из {totalItems} задач
+            Страница {currentPage} из {totalPages} • Показано {tasks.length} из {totalItems} задач
           </div>
 
           {renderPagination()}
