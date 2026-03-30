@@ -166,9 +166,12 @@ function RepliesPage() {
       );
 
       alert('✅ Задача успешно обновлена!');
-      window.location.reload();
+
+      return result;
     } catch (err) {
+      console.error('Update error:', err);
       alert('Ошибка обновления задачи: ' + err.message);
+      throw err;
     }
   };
 

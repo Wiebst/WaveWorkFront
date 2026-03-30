@@ -58,7 +58,7 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
     return dateRegex.test(deadline);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
 
@@ -87,8 +87,6 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
       return;
     }
 
-    setIsLoading(true);
-
     const technologiesArray = formData.technologies
       .split(',')
       .map((t) => t.trim())
@@ -105,14 +103,8 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
       deadline: formData.deadline || null,
     };
 
-    try {
-      await onEdit(updatedTask);
-      setIsLoading(false);
-      onClose();
-    } catch (error) {
-      setIsLoading(false);
-      setError(error.message || 'Ошибка обновления задачи');
-    }
+    onEdit(updatedTask);
+    onClose();
   };
 
   const handleClose = () => {
