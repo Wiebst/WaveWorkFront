@@ -37,7 +37,6 @@ function App() {
               path="/site/tasks"
               element={
                 <ProtectedRoute>
-                  HomePage
                   <TasksPage />
                 </ProtectedRoute>
               }

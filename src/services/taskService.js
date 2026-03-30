@@ -1,6 +1,6 @@
 import { API_BASE_URL } from './ApiConsts';
 
-const getHeaders = () => {
+export const getHeaders = () => {
   const headers = {
     'Content-Type': 'application/json',
   };

@@ -11,7 +11,7 @@ function RepliesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
   const loadUserTasks = useCallback(async () => {
@@ -19,9 +19,16 @@ function RepliesPage() {
     setError('');
     try {
       const response = await taskService.getUserTasks();
-      const tasksData = response.data || response;
-      setTasks(tasksData);
+
+      const tasksData = response.data || [];
+
+      const pagination = response.pagination || response.meta || {};
+      setTotalPages(pagination.totalPages || pagination.total_pages || 1);
+      setTotalItems(pagination.totalItems || pagination.total_items || tasksData.length);
+
       await loadProposalsForTasks(tasksData);
+
+      setTasks(tasksData);
     } catch (err) {
       setError(err.message || 'Ошибка загрузки ваших задач');
       console.error('Failed to load user tasks:', err);
@@ -35,12 +42,15 @@ function RepliesPage() {
   }, [loadUserTasks]);
 
   const loadProposalsForTasks = async (tasksList) => {
+    if (!tasksList || tasksList.length === 0) return;
+
     try {
       const tasksWithProposals = await Promise.all(
         tasksList.map(async (task) => {
           try {
             const proposalsResponse = await proposalService.getTaskProposals(task.id, 1, 100);
-            const proposals = proposalsResponse.items || proposalsResponse;
+            const proposals =
+              proposalsResponse.items || proposalsResponse.data || proposalsResponse;
             return { ...task, responses: proposals };
           } catch (err) {
             console.error(`Failed to load proposals for task ${task.id}:`, err);
@@ -61,17 +71,11 @@ function RepliesPage() {
   const handleAddTaskSubmit = async (taskData) => {
     try {
       const createdTask = await taskService.createTask(taskData);
-      if (currentPage === 1) {
-        setTasks((prevTasks) => [createdTask, ...prevTasks]);
-      }
-      setTotalItems((prev) => prev + 1);
-      alert('✅ Задача успешно добавлена!');
 
-      if (currentPage !== 1) {
-        setCurrentPage(1);
-      } else {
-        await loadUserTasks();
-      }
+      setTasks((prevTasks) => [createdTask, ...prevTasks]);
+      setTotalItems((prev) => prev + 1);
+
+      alert('✅ Задача успешно добавлена!');
     } catch (err) {
       alert('Ошибка добавления задачи: ' + err.message);
     }
@@ -80,15 +84,18 @@ function RepliesPage() {
   const handleDeleteTask = async (taskId) => {
     try {
       await taskService.deleteTask(taskId);
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
-      setTotalItems((prev) => prev - 1);
-      alert('✅ Задача успешно удалена!');
 
-      if (tasks.length === 1 && currentPage > 1) {
-        setCurrentPage(currentPage - 1);
-      } else {
-        await loadUserTasks();
-      }
+      setTasks((prevTasks) => {
+        const newTasks = prevTasks.filter((task) => task.id !== taskId);
+        if (newTasks.length === 0) {
+          setTotalItems(0);
+        } else {
+          setTotalItems((prev) => prev - 1);
+        }
+        return newTasks;
+      });
+
+      alert('✅ Задача успешно удалена!');
     } catch (err) {
       alert('Ошибка удаления задачи: ' + err.message);
     }
