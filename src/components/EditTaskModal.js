@@ -102,7 +102,7 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
       setFormData({
         title: task.title || '',
         description: task.description || task.desc || '',
-        budget: task.budget || task.salary ? task.salary.toString() : '',
+        budget: task.budget?.toString() ?? '',
         specialization: task.specialization || '',
         technologies: task.technologies || (task.tech ? task.tech.join(', ') : ''),
         deadline: task.deadline ? task.deadline.slice(0, 16) : '',
