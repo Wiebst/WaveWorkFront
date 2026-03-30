@@ -102,7 +102,12 @@ function RepliesPage() {
 
   const handleAddTaskSubmit = async (taskData) => {
     try {
-      const createdTask = await taskService.createTask(taskData);
+      const taskToCreate = {
+        ...taskData,
+        deadline: taskData.deadline ? new Date(taskData.deadline).toISOString() : null,
+      };
+
+      const createdTask = await taskService.createTask(taskToCreate);
       setTasks((prevTasks) => [createdTask, ...prevTasks]);
       setTotalItems((prev) => prev + 1);
       alert('✅ Задача успешно добавлена!');
@@ -141,7 +146,12 @@ function RepliesPage() {
     }
 
     try {
-      const result = await taskService.updateTask(updatedTask.id, updatedTask);
+      const taskToUpdate = {
+        ...updatedTask,
+        deadline: updatedTask.deadline ? new Date(updatedTask.deadline).toISOString() : null,
+      };
+
+      const result = await taskService.updateTask(taskToUpdate.id, taskToUpdate);
 
       setTasks((prevTasks) =>
         prevTasks.map((task) => {
@@ -156,6 +166,8 @@ function RepliesPage() {
       );
 
       alert('✅ Задача успешно обновлена!');
+
+      window.location.reload();
     } catch (err) {
       alert('Ошибка обновления задачи: ' + err.message);
     }
