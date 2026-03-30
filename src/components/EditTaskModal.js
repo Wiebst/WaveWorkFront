@@ -58,7 +58,7 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
     return dateRegex.test(deadline);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -105,11 +105,17 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
       deadline: formData.deadline || null,
     };
 
-    onEdit(updatedTask);
+    try {
+      await onEdit(updatedTask);
+    } catch (error) {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
     resetForm();
+    setIsLoading(false);
+    setError('');
     onClose();
   };
 
@@ -126,6 +132,13 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
     }
     setError('');
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(false);
+      setError('');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
