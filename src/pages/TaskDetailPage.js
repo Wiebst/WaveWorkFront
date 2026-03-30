@@ -15,7 +15,8 @@ function TaskDetailPage() {
     setError('');
     try {
       const data = await taskService.getTaskById(id);
-      setTask(data);
+      const task = data.data || data;
+      setTask(task);
     } catch (err) {
       setError(err.message || 'Ошибка загрузки задачи');
       console.error('Failed to load task:', err);
@@ -134,7 +135,7 @@ function TaskDetailPage() {
               {task.technologies && task.technologies.length > 0 ? (
                 task.technologies.map((tech, idx) => (
                   <span className="tech-tag-large" key={idx}>
-                    {tech}
+                    {tech.name}
                   </span>
                 ))
               ) : (
