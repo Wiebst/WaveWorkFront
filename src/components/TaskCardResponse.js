@@ -6,7 +6,6 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Защита от undefined task
   if (!task) {
     return null;
   }
@@ -59,7 +58,6 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
     });
   };
 
-  // Безопасное получение данных с дефолтными значениями
   const title = task.title || 'Без названия';
   const specialization = task.specialization || 'Без специализации';
   const budget = task.budget;
@@ -111,7 +109,15 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
         <div className={`responses-list ${isOpen ? 'open' : ''}`}>
           {responses.length > 0 ? (
             responses.map((response, index) => (
-              <ResponseItem key={response?.id || index} response={response} />
+              <ResponseItem
+                key={response?.id || index}
+                response={{
+                  login: response.contact?.username || response.executorId || 'Пользователь',
+                  phone: response.contact?.phone,
+                  email: response.contact?.email,
+                  telegram: response.contact?.telegramUsername,
+                }}
+              />
             ))
           ) : (
             <div className="empty-responses">Нет откликов</div>

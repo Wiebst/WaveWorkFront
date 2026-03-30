@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import TaskCardResponse from '../components/TaskCardResponse';
 import AddTaskModal from '../components/AddTaskModal';
 import { taskService } from '../services/taskService';
@@ -19,16 +19,15 @@ function RepliesPage() {
     setError('');
     try {
       const response = await taskService.getUserTasks();
-
       const tasksData = response.data || [];
-
       const pagination = response.pagination || response.meta || {};
+
       setTotalPages(pagination.totalPages || pagination.total_pages || 1);
       setTotalItems(pagination.totalItems || pagination.total_items || tasksData.length);
 
-      await loadProposalsForTasks(tasksData);
+      const tasksWithProposalsAndContacts = await loadProposalsAndContactsForTasks(tasksData);
 
-      setTasks(tasksData);
+      setTasks(tasksWithProposalsAndContacts);
     } catch (err) {
       setError(err.message || 'Ошибка загрузки ваших задач');
       console.error('Failed to load user tasks:', err);
@@ -37,15 +36,11 @@ function RepliesPage() {
     }
   }, []);
 
-  useEffect(() => {
-    loadUserTasks();
-  }, [loadUserTasks]);
-
-  const loadProposalsForTasks = async (tasksList) => {
-    if (!tasksList || tasksList.length === 0) return;
+  const loadProposalsAndContactsForTasks = async (tasksList) => {
+    if (!tasksList || tasksList.length === 0) return [];
 
     try {
-      const tasksWithProposals = await Promise.all(
+      const tasksWithDetails = await Promise.all(
         tasksList.map(async (task) => {
           if (!task || !task.id) {
             console.error('Invalid task object:', task);
@@ -56,18 +51,50 @@ function RepliesPage() {
             const proposalsResponse = await proposalService.getTaskProposals(task.id, 1, 100);
             const proposals =
               proposalsResponse?.items || proposalsResponse?.data || proposalsResponse || [];
-            return { ...task, responses: proposals };
+
+            const proposalsWithContacts = await Promise.all(
+              proposals.map(async (proposal) => {
+                if (!proposal.executorId) {
+                  return { ...proposal, contact: null };
+                }
+
+                try {
+                  const contact = await taskService.getUserContact(proposal.executorId);
+                  return {
+                    ...proposal,
+                    contact: contact,
+                  };
+                } catch (contactError) {
+                  console.warn(
+                    `Failed to load contact for executor ${proposal.executorId}:`,
+                    contactError,
+                  );
+                  return { ...proposal, contact: null };
+                }
+              }),
+            );
+
+            return {
+              ...task,
+              responses: proposalsWithContacts,
+            };
           } catch (err) {
             console.error(`Failed to load proposals for task ${task.id}:`, err);
             return { ...task, responses: [] };
           }
         }),
       );
-      setTasks(tasksWithProposals);
+
+      return tasksWithDetails;
     } catch (err) {
-      console.error('Error loading proposals:', err);
+      console.error('Error loading proposals and contacts:', err);
+      return tasksList;
     }
   };
+
+  useEffect(() => {
+    loadUserTasks();
+  }, [loadUserTasks, currentPage]);
 
   const handleAddTask = () => {
     setIsModalOpen(true);
@@ -76,10 +103,8 @@ function RepliesPage() {
   const handleAddTaskSubmit = async (taskData) => {
     try {
       const createdTask = await taskService.createTask(taskData);
-
       setTasks((prevTasks) => [createdTask, ...prevTasks]);
       setTotalItems((prev) => prev + 1);
-
       alert('✅ Задача успешно добавлена!');
     } catch (err) {
       alert('Ошибка добавления задачи: ' + err.message);
@@ -94,7 +119,6 @@ function RepliesPage() {
 
     try {
       await taskService.deleteTask(taskId);
-
       setTasks((prevTasks) => {
         const newTasks = prevTasks.filter((task) => task?.id !== taskId);
         if (newTasks.length === 0) {
@@ -104,7 +128,6 @@ function RepliesPage() {
         }
         return newTasks;
       });
-
       alert('✅ Задача успешно удалена!');
     } catch (err) {
       alert('Ошибка удаления задачи: ' + err.message);

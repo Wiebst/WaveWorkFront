@@ -28,6 +28,26 @@ export const taskService = {
     }
   },
 
+  async getUserContact(userUuid) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/me/contact/${userUuid}`, {
+        method: 'GET',
+        headers: getHeaders(),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки контактов');
+      }
+
+      const contactData = await response.json();
+      return contactData;
+    } catch (error) {
+      console.error(`Error loading contact for user ${userUuid}:`, error);
+      throw error;
+    }
+  },
+
   async getUserTasks() {
     try {
       const response = await fetch(`${API_BASE_URL}/work/api/tasks/my`, {
@@ -43,45 +63,9 @@ export const taskService = {
 
       const tasksData = await response.json();
 
-      const tasksWithContacts = await Promise.all(
-        tasksData.data.map(async (task) => {
-          if (!task.executorId) return task;
-
-          try {
-            const contactResponse = await fetch(`${API_BASE_URL}/me/contact/${task.executorId}`, {
-              method: 'GET',
-              headers: getHeaders(),
-              credentials: 'include',
-            });
-
-            if (contactResponse.ok) {
-              const contactData = await contactResponse.json();
-              return {
-                ...task,
-                contact: {
-                  email: contactData.email,
-                  phone: contactData.phone,
-                  telegramUsername: contactData.telegramUsername,
-                },
-              };
-            }
-          } catch (contactError) {
-            console.warn(
-              `Не удалось загрузить контакты для executorId ${task.executorId}:`,
-              contactError,
-            );
-          }
-
-          return task;
-        }),
-      );
-
-      return {
-        ...tasksData,
-        data: tasksWithContacts,
-      };
+      return tasksData;
     } catch (error) {
-      console.error('Error fetching user tasks:', error);
+      console.error('Error loading user tasks:', error);
       throw error;
     }
   },
