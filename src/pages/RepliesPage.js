@@ -108,9 +108,8 @@ function RepliesPage() {
       };
 
       const createdTask = await taskService.createTask(taskToCreate);
-      setTasks((prevTasks) => [createdTask, ...prevTasks]);
-      setTotalItems((prev) => prev + 1);
       alert('✅ Задача успешно добавлена!');
+      window.location.reload();
     } catch (err) {
       alert('Ошибка добавления задачи: ' + err.message);
     }
