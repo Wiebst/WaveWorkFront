@@ -47,10 +47,15 @@ function RepliesPage() {
     try {
       const tasksWithProposals = await Promise.all(
         tasksList.map(async (task) => {
+          if (!task || !task.id) {
+            console.error('Invalid task object:', task);
+            return { ...task, responses: [] };
+          }
+
           try {
             const proposalsResponse = await proposalService.getTaskProposals(task.id, 1, 100);
             const proposals =
-              proposalsResponse.items || proposalsResponse.data || proposalsResponse;
+              proposalsResponse?.items || proposalsResponse?.data || proposalsResponse || [];
             return { ...task, responses: proposals };
           } catch (err) {
             console.error(`Failed to load proposals for task ${task.id}:`, err);
@@ -82,11 +87,16 @@ function RepliesPage() {
   };
 
   const handleDeleteTask = async (taskId) => {
+    if (!taskId) {
+      alert('Ошибка: идентификатор задачи не указан');
+      return;
+    }
+
     try {
       await taskService.deleteTask(taskId);
 
       setTasks((prevTasks) => {
-        const newTasks = prevTasks.filter((task) => task.id !== taskId);
+        const newTasks = prevTasks.filter((task) => task?.id !== taskId);
         if (newTasks.length === 0) {
           setTotalItems(0);
         } else {
@@ -102,9 +112,14 @@ function RepliesPage() {
   };
 
   const handleEditTask = async (updatedTask) => {
+    if (!updatedTask || !updatedTask.id) {
+      alert('Ошибка: некорректные данные задачи');
+      return;
+    }
+
     try {
       const result = await taskService.updateTask(updatedTask.id, updatedTask);
-      setTasks((prevTasks) => prevTasks.map((task) => (task.id === result.id ? result : task)));
+      setTasks((prevTasks) => prevTasks.map((task) => (task?.id === result.id ? result : task)));
       alert('✅ Задача успешно обновлена!');
     } catch (err) {
       alert('Ошибка обновления задачи: ' + err.message);
@@ -241,14 +256,16 @@ function RepliesPage() {
       ) : (
         <>
           <div className="tasks-grid">
-            {tasks.map((task) => (
-              <TaskCardResponse
-                key={task.id}
-                task={task}
-                onDelete={handleDeleteTask}
-                onEdit={handleEditTask}
-              />
-            ))}
+            {tasks.map((task) =>
+              task && task.id ? (
+                <TaskCardResponse
+                  key={task.id}
+                  task={task}
+                  onDelete={handleDeleteTask}
+                  onEdit={handleEditTask}
+                />
+              ) : null,
+            )}
           </div>
 
           <div className="pagination-info">
