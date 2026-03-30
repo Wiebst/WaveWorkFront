@@ -107,8 +107,11 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
 
     try {
       await onEdit(updatedTask);
+      setIsLoading(false);
+      onClose();
     } catch (error) {
       setIsLoading(false);
+      setError(error.message || 'Ошибка обновления задачи');
     }
   };
 

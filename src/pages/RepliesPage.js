@@ -166,7 +166,6 @@ function RepliesPage() {
       );
 
       alert('✅ Задача успешно обновлена!');
-
       window.location.reload();
     } catch (err) {
       alert('Ошибка обновления задачи: ' + err.message);
