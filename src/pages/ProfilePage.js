@@ -4,6 +4,7 @@ import EmailVerificationModal from '../components/EmailVerificationModal';
 import { emailService } from '../services/emailService';
 import { telegramService } from '../services/telegramService';
 import { authService } from '../services/authService';
+import { API_BASE_URL } from '../services/ApiConsts';
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -26,9 +27,8 @@ function ProfilePage() {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/profile/me', {
+        const response = await fetch(`${API_BASE_URL}/profile/profiles/me`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json',
           },
         });

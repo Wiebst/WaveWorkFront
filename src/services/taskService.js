@@ -30,7 +30,7 @@ export const taskService = {
 
   async getUserContact(userUuid) {
     try {
-      const response = await fetch(`${API_BASE_URL}/me/contact/${userUuid}`, {
+      const response = await fetch(`${API_BASE_URL}/profile/profiles/me/contact/${userUuid}`, {
         method: 'GET',
         headers: getHeaders(),
         credentials: 'include',
