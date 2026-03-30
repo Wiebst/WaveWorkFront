@@ -17,12 +17,13 @@ function TasksPage() {
     setError('');
     try {
       const response = await taskService.getAllTasks(currentPage, limit);
+      console.log('Response:', response);
+
       const tasksData = response.data || response.items || response;
-      const pagination = response.pagination || response.meta || {};
 
       setTasks(Array.isArray(tasksData) ? tasksData : []);
-      setTotalPages(pagination.totalPages || response.totalPages || 1);
-      setTotalItems(pagination.totalItems || response.totalItems || tasksData.length);
+      setTotalPages(response.totalPages || 1);
+      setTotalItems(response.total || tasksData.length);
     } catch (err) {
       setError(err.message || 'Ошибка загрузки задач');
       console.error('Failed to load tasks:', err);
@@ -163,10 +164,8 @@ function TasksPage() {
           </div>
 
           <div className="pagination-info">
-            Показано {tasks.length} из {totalItems} задач
+            Страница {currentPage} из {totalPages} • Показано {tasks.length} из {totalItems} задач
           </div>
-
-          {renderPagination()}
         </>
       )}
     </div>
