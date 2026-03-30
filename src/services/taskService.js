@@ -56,7 +56,7 @@ export const taskService = {
           //       },
           try {
             const allContacts = await Promise.all(task.executors.map(async executorId => {
-              const contactResponse = await fetch(`${API_BASE_URL}/profile/me/contact/${executorId}`, {
+              const contactResponse = await fetch(`${API_BASE_URL}/profile/profiles/me/contact/${executorId}`, {
                 method: 'GET',
                 headers: getHeaders(),
                 credentials: 'include',

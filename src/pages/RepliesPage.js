@@ -41,7 +41,7 @@ function RepliesPage() {
         tasksList.map(async (task) => {
           try {
             const proposalsResponse = await proposalService.getTaskProposals(task.id, 1, 100);
-            const proposals = proposalsResponse.items || proposalsResponse;
+            const proposals = proposalsResponse.data || proposalsResponse;
             return { ...task, responses: proposals };
           } catch (err) {
             console.error(`Failed to load proposals for task ${task.id}:`, err);
