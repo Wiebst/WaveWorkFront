@@ -6,12 +6,19 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Защита от undefined task
+  if (!task) {
+    return null;
+  }
+
   const toggleResponses = () => {
     setIsOpen(!isOpen);
   };
 
   const handleDelete = () => {
-    if (window.confirm(`Вы уверены, что хотите удалить задачу "${task.title}"?`)) {
+    if (
+      window.confirm(`Вы уверены, что хотите удалить задачу "${task.title || 'без названия'}"?`)
+    ) {
       onDelete(task.id);
     }
   };
@@ -52,34 +59,39 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
     });
   };
 
+  // Безопасное получение данных с дефолтными значениями
+  const title = task.title || 'Без названия';
+  const specialization = task.specialization || 'Без специализации';
+  const budget = task.budget;
+  const description = task.description || task.desc || 'Описание отсутствует';
+  const technologies = task.technologies || [];
+  const deadline = task.deadline;
+  const responses = task.responses || [];
+
   return (
     <>
       <div className="task-card">
         <div className="card-header">
           <div className="company-logo">{task.logo || '📋'}</div>
           <div className="company-info">
-            <div className="company-name">{task.title || 'Без названия'}</div>
-            <div className="job-title">{task.specialization || 'Без специализации'}</div>
+            <div className="company-name">{title}</div>
+            <div className="job-title">{specialization}</div>
           </div>
-          <div className="salary-badge">💰 {formatSalary(task.budget)}</div>
+          <div className="salary-badge">💰 {formatSalary(budget)}</div>
         </div>
 
         <div className="card-body">
-          {task.technologies && task.technologies.length > 0 && (
+          {technologies.length > 0 && (
             <div className="tech-stack">
-              {task.technologies.map((tech) => (
-                <span className="tech-tag" key={tech.id}>
-                  {tech.name}
+              {technologies.map((tech, index) => (
+                <span className="tech-tag" key={tech?.id || index}>
+                  {tech?.name || tech || 'Технология'}
                 </span>
               ))}
             </div>
           )}
-          <div className="job-description">
-            {task.description || task.desc || 'Описание отсутствует'}
-          </div>
-          {task.deadline && (
-            <div className="deadline-info">⏰ Дедлайн: {formatDeadline(task.deadline)}</div>
-          )}
+          <div className="job-description">{description}</div>
+          {deadline && <div className="deadline-info">⏰ Дедлайн: {formatDeadline(deadline)}</div>}
         </div>
 
         <div className="card-footer">
@@ -88,7 +100,7 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
               ✏️ Редактировать
             </button>
             <button className="responses-btn" onClick={toggleResponses}>
-              📋 Отклики ({task.contacts?.length || 0})
+              📋 Отклики ({responses.length})
             </button>
             <button className="delete-btn" onClick={handleDelete}>
               🗑️ Удалить
@@ -97,9 +109,9 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
         </div>
 
         <div className={`responses-list ${isOpen ? 'open' : ''}`}>
-          {task.responses && task.contacts.length > 0 ? (
-            task.responses.map((contact) => (
-              <ResponseItem key={contact.executorId} response={contact} />
+          {responses.length > 0 ? (
+            responses.map((response, index) => (
+              <ResponseItem key={response?.id || index} response={response} />
             ))
           ) : (
             <div className="empty-responses">Нет откликов</div>
