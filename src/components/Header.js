@@ -6,11 +6,11 @@ function Header() {
     <header className="main-header">
       <div className="container header-inner">
         <div className="nav-left">
-          <NavLink to="/site" className="logo">
+          <NavLink to="/site/HomePage" className="logo">
             🌊 WaveWork
           </NavLink>
           <NavLink
-            to="/site"
+            to="/site/HomePage"
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
             end
           >

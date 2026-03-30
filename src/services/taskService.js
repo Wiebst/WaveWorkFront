@@ -161,7 +161,12 @@ export const taskService = {
         throw new Error(errorData.message || 'Ошибка удаления задачи');
       }
 
-      return await response.json();
+      if (response.status === 204 || response.headers.get('content-length') === '0') {
+        return null;
+      }
+
+      const text = await response.text();
+      return text ? JSON.parse(text) : null;
     } catch (error) {
       console.error('Error deleting task:', error);
       throw error;

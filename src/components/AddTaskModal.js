@@ -31,7 +31,7 @@ function AddTaskModal({ isOpen, onClose, onAdd }) {
     return dateRegex.test(deadline);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -66,7 +66,7 @@ function AddTaskModal({ isOpen, onClose, onAdd }) {
       title: formData.title,
       description: formData.description,
       budget: parseFloat(formData.budget),
-      category: 'null', // всегда строка "null"
+      category: 'null',
       specialization: formData.specialization,
       technologies: formData.technologies
         .split(',')
@@ -75,7 +75,12 @@ function AddTaskModal({ isOpen, onClose, onAdd }) {
       deadline: formData.deadline || null,
     };
 
-    onAdd(taskData);
+    try {
+      await onAdd(taskData);
+      handleClose();
+    } catch (error) {
+      setIsLoading(false);
+    }
   };
 
   const resetForm = () => {

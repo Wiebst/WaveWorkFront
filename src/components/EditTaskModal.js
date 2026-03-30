@@ -13,6 +13,20 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const formatTechnologiesToString = (technologies) => {
+    if (!technologies || technologies.length === 0) return '';
+
+    if (technologies[0]?.name) {
+      return technologies.map((tech) => tech.name).join(', ');
+    }
+
+    if (typeof technologies[0] === 'string') {
+      return technologies.join(', ');
+    }
+
+    return '';
+  };
+
   useEffect(() => {
     if (task) {
       setFormData({
@@ -20,7 +34,7 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
         description: task.description || task.desc || '',
         budget: task.budget?.toString() ?? '',
         specialization: task.specialization || '',
-        technologies: task.technologies || (task.tech ? task.tech.join(', ') : ''),
+        technologies: formatTechnologiesToString(task.technologies || task.tech),
         deadline: task.deadline ? task.deadline.slice(0, 16) : '',
       });
     }
@@ -75,6 +89,11 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
 
     setIsLoading(true);
 
+    const technologiesArray = formData.technologies
+      .split(',')
+      .map((t) => t.trim())
+      .filter((t) => t);
+
     const updatedTask = {
       ...task,
       title: formData.title,
@@ -82,10 +101,7 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
       budget: parseFloat(formData.budget),
       category: 'null',
       specialization: formData.specialization,
-      technologies: formData.technologies
-        .split(',')
-        .map((t) => t.trim())
-        .filter((t) => t),
+      technologies: technologiesArray,
       deadline: formData.deadline || null,
     };
 
@@ -104,7 +120,7 @@ function EditTaskModal({ isOpen, onClose, onEdit, task }) {
         description: task.description || task.desc || '',
         budget: task.budget?.toString() ?? '',
         specialization: task.specialization || '',
-        technologies: task.technologies || (task.tech ? task.tech.join(', ') : ''),
+        technologies: formatTechnologiesToString(task.technologies || task.tech),
         deadline: task.deadline ? task.deadline.slice(0, 16) : '',
       });
     }
