@@ -194,7 +194,7 @@ function TaskDetailPage() {
               <div className="contact-info">
                 <div className="contact-label">Email</div>
                 <div className="contact-value">
-                  {task.contacts?.email ? (
+                  {contacts?.email ? (
                     <a href={`mailto:${contacts.email}`}>{contacts.email}</a>
                   ) : (
                     'Не указан'
@@ -207,7 +207,7 @@ function TaskDetailPage() {
               <div className="contact-info">
                 <div className="contact-label">Telegram</div>
                 <div className="contact-value">
-                  {task.contacts?.telegram ? (
+                  {contacts?.telegram ? (
                     <a
                       href={`https://t.me/${contacts.telegram.replace('@', '')}`}
                       target="_blank"
