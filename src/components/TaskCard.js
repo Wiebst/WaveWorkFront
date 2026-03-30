@@ -24,14 +24,19 @@ function TaskCard({ task }) {
     if (!deadline) return null;
     const date = new Date(deadline);
     if (isNaN(date.getTime())) return null;
+    if (date.getFullYear() === 1970 && date.getMonth() === 0 && date.getDate() === 1) {
+      return null;
+    }
     return date.toLocaleString('ru-RU', {
       day: 'numeric',
       month: 'short',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'UTC',
+      timeZoneName: 'short',
     });
   };
-
   return (
     <div className="task-card">
       <div className="card-header">
@@ -56,9 +61,9 @@ function TaskCard({ task }) {
         <div className="job-description">
           {task.description || task.desc || 'Описание отсутствует'}
         </div>
-        {task.deadline && (
+        {task.deadline && formatDeadline(task.deadline) ? (
           <div className="deadline-info">⏰ Дедлайн: {formatDeadline(task.deadline)}</div>
-        )}
+        ) : null}
       </div>
 
       <div className="card-footer">

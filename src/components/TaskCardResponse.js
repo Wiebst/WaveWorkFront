@@ -31,7 +31,7 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
     setIsEditModalOpen(false);
   };
 
-  const formatSalary = (salary) => {
+  const formatBudget = (salary) => {
     if (!salary && salary !== 0) return 'не указана';
     if (typeof salary === 'string' && salary.includes('₽')) {
       return salary;
@@ -49,12 +49,18 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
   const formatDeadline = (deadline) => {
     if (!deadline) return null;
     const date = new Date(deadline);
-    if (isNaN(date.getTime()) || date.getFullYear() === 1970) return null;
+    if (isNaN(date.getTime())) return null;
+    if (date.getFullYear() === 1970 && date.getMonth() === 0 && date.getDate() === 1) {
+      return null;
+    }
     return date.toLocaleString('ru-RU', {
       day: 'numeric',
       month: 'short',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'UTC',
+      timeZoneName: 'short',
     });
   };
 
@@ -75,7 +81,7 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
             <div className="company-name">{title}</div>
             <div className="job-title">{specialization}</div>
           </div>
-          <div className="salary-badge">💰 {formatSalary(budget)}</div>
+          <div className="salary-badge">💰 {formatBudget(budget)}</div>
         </div>
 
         <div className="card-body">

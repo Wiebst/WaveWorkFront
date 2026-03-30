@@ -186,6 +186,11 @@ function AddTaskModal({ isOpen, onClose, onAdd }) {
                 onChange={handleChange}
                 disabled={isLoading}
               />
+              <small
+                style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}
+              >
+                ⏰ Время указывается в UTC. Пример: 2024-12-31 23:59
+              </small>
             </div>
           </div>
 
