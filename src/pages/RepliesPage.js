@@ -142,7 +142,19 @@ function RepliesPage() {
 
     try {
       const result = await taskService.updateTask(updatedTask.id, updatedTask);
-      setTasks((prevTasks) => prevTasks.map((task) => (task?.id === result.id ? result : task)));
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => {
+          if (task?.id === result.id) {
+            return {
+              ...result,
+              responses: task.responses || [],
+            };
+          }
+          return task;
+        }),
+      );
+
       alert('✅ Задача успешно обновлена!');
     } catch (err) {
       alert('Ошибка обновления задачи: ' + err.message);
