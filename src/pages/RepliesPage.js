@@ -19,6 +19,7 @@ function RepliesPage() {
     setError('');
     try {
       const response = await taskService.getUserTasks();
+      console.log(response);
       const tasksData = response.data || response;
       setTasks(tasksData);
       await loadProposalsForTasks(tasksData);

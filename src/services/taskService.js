@@ -45,29 +45,36 @@ export const taskService = {
 
       const tasksWithContacts = await Promise.all(
         tasksData.data.map(async (task) => {
-          if (!task.executorId) return task;
+          if (!task.executors) return task;
 
+          // return {
+          //       ...task,
+          //       contact: {
+          //         email: contactData.email,
+          //         phone: contactData.phone,
+          //         telegramUsername: contactData.telegramUsername,
+          //       },
           try {
-            const contactResponse = await fetch(`${API_BASE_URL}/me/contact/${task.executorId}`, {
-              method: 'GET',
-              headers: getHeaders(),
-              credentials: 'include',
-            });
+            const allContacts = await Promise.all(task.executors.map(async executorId => {
+              const contactResponse = await fetch(`${API_BASE_URL}/profile/me/contact/${executorId}`, {
+                method: 'GET',
+                headers: getHeaders(),
+                credentials: 'include',
+              });
 
-            if (contactResponse.ok) {
-              const contactData = await contactResponse.json();
-              return {
-                ...task,
-                contact: {
-                  email: contactData.email,
-                  phone: contactData.phone,
-                  telegramUsername: contactData.telegramUsername,
-                },
-              };
-            }
+              if (contactResponse.ok) {
+                const contactData = await contactResponse.json();
+                return contactData;
+              }
+            }));
+
+            return {
+              ...task,
+              contacts: allContacts
+            };
           } catch (contactError) {
             console.warn(
-              `Не удалось загрузить контакты для executorId ${task.executorId}:`,
+              `Не удалось загрузить контакты для task.executors ${task.executors}:`,
               contactError,
             );
           }
