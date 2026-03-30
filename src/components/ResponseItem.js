@@ -4,13 +4,13 @@ import React from 'react';
  * Компонент для отображения одного отклика соискателя
  * @param {Object} props
  * @param {Object} props.response - Данные отклика
- * @param {string} props.response.login - Логин соискателя
+ * @param {string} props.response.username - Логин соискателя
  * @param {string} [props.response.phone] - Телефон (опционально)
  * @param {string} [props.response.email] - Email (опционально)
  * @param {string} [props.response.telegram] - Telegram username (опционально)
  */
 function ResponseItem({ response }) {
-  const { login, phone, email, telegram } = response;
+  const { username, phone, email, telegram } = response;
 
   const cleanTelegram = telegram?.startsWith('@') ? telegram.slice(1) : telegram;
 
@@ -48,7 +48,7 @@ function ResponseItem({ response }) {
 
   return (
     <div className="response-item">
-      <div className="response-name">👤 {login || 'Пользователь'}</div>
+      <div className="response-name">👤 {username || 'Пользователь'}</div>
 
       {contacts.length > 0 ? (
         <div className="response-contacts">

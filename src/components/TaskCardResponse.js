@@ -88,7 +88,7 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
               ✏️ Редактировать
             </button>
             <button className="responses-btn" onClick={toggleResponses}>
-              📋 Отклики ({task.responses?.length || 0})
+              📋 Отклики ({task.contacts?.length || 0})
             </button>
             <button className="delete-btn" onClick={handleDelete}>
               🗑️ Удалить
@@ -97,9 +97,9 @@ function TaskCardResponse({ task, onDelete, onEdit }) {
         </div>
 
         <div className={`responses-list ${isOpen ? 'open' : ''}`}>
-          {task.responses && task.responses.length > 0 ? (
-            task.responses.map((response, index) => (
-              <ResponseItem key={index} response={response} />
+          {task.responses && task.contacts.length > 0 ? (
+            task.responses.map((contact) => (
+              <ResponseItem key={contact.executorId} response={contact} />
             ))
           ) : (
             <div className="empty-responses">Нет откликов</div>

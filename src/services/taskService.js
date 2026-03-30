@@ -64,6 +64,7 @@ export const taskService = {
 
               if (contactResponse.ok) {
                 const contactData = await contactResponse.json();
+                contactData.executorId = executorId;
                 return contactData;
               }
             }));
