@@ -6,30 +6,30 @@ function Header() {
     <header className="main-header">
       <div className="container header-inner">
         <div className="nav-left">
-          <NavLink to="/site/HomePage" className="logo">
+          <NavLink to="/" className="logo">
             🌊 WaveWork
           </NavLink>
           <NavLink
-            to="/site/HomePage"
+            to="/"
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
             end
           >
             Главная
           </NavLink>
           <NavLink
-            to="/site/tasks"
+            to="/tasks"
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
           >
             Задачи
           </NavLink>
           <NavLink
-            to="/site/replies"
+            to="/replies"
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
           >
             Отклики
           </NavLink>
           <NavLink
-            to="/site/profile"
+            to="/profile"
             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
           >
             Профиль

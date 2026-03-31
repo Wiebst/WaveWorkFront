@@ -5,7 +5,7 @@ function TaskCard({ task }) {
   const navigate = useNavigate();
 
   const handleNavigate = () => {
-    navigate(`/site/task/${task.id}`);
+    navigate(`/task/${task.id}`);
   };
 
   const formatBudget = (budget) => {

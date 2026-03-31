@@ -9,7 +9,7 @@ function HomePage() {
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
     if (!isAuthenticated) {
-      navigate('/site/login');
+      navigate('/login');
     } else {
       try {
         const response = await telegramService.getTelegramLink();
